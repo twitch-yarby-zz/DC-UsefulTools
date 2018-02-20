@@ -1,0 +1,1 @@
+@cls & @echo Time: %date% %time% & @echo Host Name: %computername% & @systeminfo > %temp%\sys.tmp & @findstr /c:"System Boot Time" %temp%\sys.tmp & @findstr /c:"System Up Time" %temp%\sys.tmp & @findstr /c:"Physical Memory" %temp%\sys.tmp & @echo CPU Utilization & @wmic cpu get LoadPercentage |findstr /V "LoadPercentage" & wmic logicaldisk get size,freespace,caption

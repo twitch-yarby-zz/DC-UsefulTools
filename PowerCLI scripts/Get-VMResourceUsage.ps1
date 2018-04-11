@@ -14,22 +14,22 @@ $session = Connect-VIServer -Server $vSphereIP -User $vSphereUser -Password $vSp
 
 if($session.IsConnected -eq $true)
 {
-	Write-Host "Success"
+	Write-Output "Success"
 
 	$VM = Get-VM -Name $vmName
 
-	if($VM -ne $null)
+	if($null -ne $VM)
 	{
 		
-		Write-Host "Located VM. Retrieving data..."
+		Write-Output "Located VM. Retrieving data..."
 
-		$vmstat = "" | Select VmName, MemMax, MemAvg, MemMin, CPUMax, CPUAvg, CPUMin
+		$vmstat = "" | Select-Object VmName, MemMax, MemAvg, MemMin, CPUMax, CPUAvg, CPUMin
 		$vmstat.VmName = $VM.name
 
 		$statcpu = Get-Stat -Entity ($VM)-start (get-date).AddHours(-1) -Finish (Get-Date) -MaxSamples 10000 -stat cpu.usage.average
 		$statmem = Get-Stat -Entity ($VM)-start (get-date).AddHours(-1) -Finish (Get-Date) -MaxSamples 10000 -stat mem.usage.average
 
-		Write-Host "Processing Data..."
+		Write-Output "Processing Data..."
 
 		$cpu = $statcpu | Measure-Object -Property value -Average -Maximum -Minimum
 		$mem = $statmem | Measure-Object -Property value -Average -Maximum -Minimum
@@ -41,7 +41,7 @@ if($session.IsConnected -eq $true)
 		$vmstat.MemAvg = $mem.Average
 		$vmstat.MemMin = $mem.Minimum
 
-		Write-Host "Results:"
+		Write-Output "Results:"
 		$vmstat | Select-Object @{Name="CPU Max";Expression={"{0:N2}" -f $_.CPUMax}},@{Name="CPU Avg";Expression={"{0:N2}" -f $_.CPUAvg}},@{Name="CPU Min";Expression={"{0:N2}" -f $_.CPUMin}}
 
 		$vmstat | Select-Object @{Name="Memory Max";Expression={"{0:N2}" -f $_.MemMax}},@{Name="Memory Avg";Expression={"{0:N2}" -f $_.MemAvg}},@{Name="Memory Min";Expression={"{0:N2}" -f $_.MemMin}}
@@ -51,13 +51,13 @@ if($session.IsConnected -eq $true)
 	}
 	else
 	{ 
-		Write-Host "Error. Unable to locate VM of name:" $vmName
+		Write-Output "Error. Unable to locate VM of name:" $vmName
 	}
 
 	Disconnect-VIServer -server $session -confirm:$false
 }
 else
 {
-	Write-Host "Failed to log in."
+	Write-Output "Failed to log in."
 }
 
